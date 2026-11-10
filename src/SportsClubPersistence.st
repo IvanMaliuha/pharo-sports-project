@@ -1,4 +1,4 @@
-'From Pharo11.0.0 of 20 October 2025 [Build information: Pharo-11.0.0+build.750.sha.963dc3a7de9ee8e5543f6e62d25a2a283f7dcd48 (64 Bit)] on 10 November 2026 at 1:38:47.335025 pm'!
+'From Pharo11.0.0 of 20 October 2025 [Build information: Pharo-11.0.0+build.750.sha.963dc3a7de9ee8e5543f6e62d25a2a283f7dcd48 (64 Bit)] on 10 November 2026 at 2:00:27.323764 pm'!
 Object subclass: #SportsClubPersistence
 	instanceVariableNames: ''
 	classVariableNames: ''
@@ -19,6 +19,35 @@ clubToDictionary: aClub
     data at: 'sportsmen' put: athletes.
 
     ^ data! !
+
+!SportsClubPersistence methodsFor: 'as yet unclassified' stamp: 'YarynaHrynko 11/10/2026 13:55'!
+loadClubFromTXT: aFilename
+    | file text data |
+
+    file := aFilename asFileReference.
+
+    file exists ifFalse: [
+        self error: 'TXT file does not exist'
+    ].
+
+    text := file contents.
+    data := STON fromString: text.
+
+    ^ self dictionaryToClub: data! !
+
+!SportsClubPersistence methodsFor: 'as yet unclassified' stamp: 'YarynaHrynko 11/10/2026 13:54'!
+saveClubToTXT: aClub filename: aFilename
+    | data text file |
+
+    data := self clubToDictionary: aClub.
+    text := STON toString: data.
+    file := aFilename asFileReference.
+
+    file writeStreamDo: [ :stream |
+        stream nextPutAll: text
+    ].
+
+    ^ file! !
 
 !SportsClubPersistence methodsFor: 'as yet unclassified' stamp: 'YarynaHrynko 11/10/2026 13:02'!
 dictionaryToSportsperson: data
