@@ -1,24 +1,7 @@
-'From Pharo11.0.0 of 20 October 2025 [Build information: Pharo-11.0.0+build.750.sha.963dc3a7de9ee8e5543f6e62d25a2a283f7dcd48 (64 Bit)] on 10 November 2026 at 4:16:43.167106 pm'!
 SpPresenter subclass: #SportsClubFilePresenter
-	instanceVariableNames: 'club persistence database reportPersistence saveJSONButton loadJSONButton saveTXTButton loadTXTButton saveReportButton loadReportButton saveSQLiteButton loadSQLiteButton currentClubId'
+	instanceVariableNames: 'club persistence database reportPersistence saveJSONButton loadJSONButton saveTXTButton loadTXTButton saveReportButton loadReportButton saveSQLiteButton loadSQLiteButton currentClubId mainPresenter'
 	classVariableNames: ''
 	package: 'SportsProject'!
-
-!SportsClubFilePresenter methodsFor: 'layout' stamp: 'YarynaHrynko 11/10/2026 15:51'!
-defaultLayout
-    ^ SpBoxLayout newTopToBottom
-        spacing: 10;
-        add: saveJSONButton;
-        add: loadJSONButton;
-        add: saveTXTButton;
-        add: loadTXTButton;
-        add: saveReportButton;
-        add: loadReportButton;
-        add: saveSQLiteButton;
-        add: loadSQLiteButton;
-        yourself
-! !
-
 
 !SportsClubFilePresenter methodsFor: 'initialization' stamp: 'YarynaHrynko 11/10/2026 16:07'!
 initializePresenters
@@ -66,22 +49,37 @@ initializePresenters
 ! !
 
 
-!SportsClubFilePresenter methodsFor: 'as yet unclassified' stamp: 'YarynaHrynko 11/10/2026 15:37'!
-saveTXT
-    | file |
+!SportsClubFilePresenter methodsFor: 'layout' stamp: 'YarynaHrynko 11/10/2026 15:51'!
+defaultLayout
+    ^ SpBoxLayout newTopToBottom
+        spacing: 10;
+        add: saveJSONButton;
+        add: loadJSONButton;
+        add: saveTXTButton;
+        add: loadTXTButton;
+        add: saveReportButton;
+        add: loadReportButton;
+        add: saveSQLiteButton;
+        add: loadSQLiteButton;
+        yourself
+! !
+
+
+!SportsClubFilePresenter methodsFor: 'as yet unclassified' stamp: 'YarynaHrynko 11/10/2026 15:47'!
+loadReport
+    | file report |
 
     file := UIManager default
-        chooseForSaveFileReference: 'Save Sports Club TXT'
+        chooseExistingFileReference: 'Open Sports Club Report'
         extensions: #('txt')
         path: FileSystem disk workingDirectory.
 
     file ifNil: [ ^ self ].
 
-    persistence
-        saveClubToTXT: club
-        filename: file fullName.
+    report := reportPersistence
+        loadReportFromFile: file fullName.
 
-    UIManager default inform: 'TXT saved successfully!!'
+    UIManager default inform: report
 ! !
 
 !SportsClubFilePresenter methodsFor: 'as yet unclassified' stamp: 'YarynaHrynko 11/10/2026 15:52'!
@@ -116,7 +114,7 @@ saveJSON
     UIManager default inform: 'Club saved successfully!!'
 ! !
 
-!SportsClubFilePresenter methodsFor: 'as yet unclassified' stamp: 'YarynaHrynko 11/10/2026 15:43'!
+!SportsClubFilePresenter methodsFor: 'as yet unclassified' stamp: 'YarynaHrynko 11/18/2026 02:58'!
 loadTXT
     | file |
 
@@ -127,13 +125,15 @@ loadTXT
 
     file ifNil: [ ^ self ].
 
-    club := persistence
-        loadClubFromTXT: file fullName.
+    club := persistence loadClubFromTXT: file fullName.
 
-    UIManager default inform: 'TXT loaded successfully!!'
-! !
+    mainPresenter ifNotNil: [
+        mainPresenter club: club
+    ].
 
-!SportsClubFilePresenter methodsFor: 'as yet unclassified' stamp: 'YarynaHrynko 11/10/2026 15:55'!
+    UIManager default inform: 'TXT loaded successfully!!'.! !
+
+!SportsClubFilePresenter methodsFor: 'as yet unclassified' stamp: 'YarynaHrynko 11/18/2026 03:02'!
 loadSQLite
     | input clubId loadedClub |
 
@@ -165,10 +165,13 @@ loadSQLite
     club := loadedClub.
     currentClubId := clubId.
 
+    mainPresenter ifNotNil: [
+        mainPresenter club: club
+    ].
+
     UIManager default inform:
         'Club loaded: ', club name,
-        ' (Athletes: ', club sportsmen size asString, ')'
-! !
+        ' (Athletes: ', club sportsmen size asString, ')'.! !
 
 !SportsClubFilePresenter methodsFor: 'as yet unclassified' stamp: 'YarynaHrynko 11/10/2026 15:45'!
 saveReport
@@ -203,7 +206,25 @@ saveReport
     UIManager default inform: 'Report saved successfully!!'
 ! !
 
-!SportsClubFilePresenter methodsFor: 'as yet unclassified' stamp: 'YarynaHrynko 11/10/2026 15:33'!
+!SportsClubFilePresenter methodsFor: 'as yet unclassified' stamp: 'YarynaHrynko 11/10/2026 15:37'!
+saveTXT
+    | file |
+
+    file := UIManager default
+        chooseForSaveFileReference: 'Save Sports Club TXT'
+        extensions: #('txt')
+        path: FileSystem disk workingDirectory.
+
+    file ifNil: [ ^ self ].
+
+    persistence
+        saveClubToTXT: club
+        filename: file fullName.
+
+    UIManager default inform: 'TXT saved successfully!!'
+! !
+
+!SportsClubFilePresenter methodsFor: 'as yet unclassified' stamp: 'YarynaHrynko 11/18/2026 02:56'!
 loadJSON
     | file |
 
@@ -214,28 +235,13 @@ loadJSON
 
     file ifNil: [ ^ self ].
 
-    club := persistence
-        loadClubFromJSON: file fullName.
+    club := persistence loadClubFromJSON: file fullName.
 
-    UIManager default inform: 'Club loaded successfully!!'
-! !
+    mainPresenter ifNotNil: [
+        mainPresenter club: club
+    ].
 
-!SportsClubFilePresenter methodsFor: 'as yet unclassified' stamp: 'YarynaHrynko 11/10/2026 15:47'!
-loadReport
-    | file report |
-
-    file := UIManager default
-        chooseExistingFileReference: 'Open Sports Club Report'
-        extensions: #('txt')
-        path: FileSystem disk workingDirectory.
-
-    file ifNil: [ ^ self ].
-
-    report := reportPersistence
-        loadReportFromFile: file fullName.
-
-    UIManager default inform: report
-! !
+    UIManager default inform: 'Club loaded successfully!!'.! !
 
 
 !SportsClubFilePresenter methodsFor: 'accessing' stamp: 'YarynaHrynko 11/10/2026 15:35'!
@@ -243,7 +249,15 @@ club
     ^ club
 ! !
 
+!SportsClubFilePresenter methodsFor: 'accessing' stamp: 'YarynaHrynko 11/18/2026 02:09'!
+mainPresenter: aPresenter
+    mainPresenter := aPresenter.! !
+
 !SportsClubFilePresenter methodsFor: 'accessing' stamp: 'YarynaHrynko 11/10/2026 16:05'!
 databasePath: aPath
     database databasePath: aPath
 ! !
+
+!SportsClubFilePresenter methodsFor: 'accessing' stamp: 'YarynaHrynko 11/18/2026 01:56'!
+club: aSportsClub
+    club := aSportsClub.! !

@@ -97,3 +97,66 @@ addSportspersonDialog
     athlete := dialog createdSportsperson.
     athlete ifNotNil: [ self addSportsperson: athlete ].
     ^ athlete! !
+!SportsClub methodsFor: 'as yet unclassified' stamp: 'YarynaHrynko 11/18/2026 03:15'!
+highestPaidSportsperson
+    sportsmen isEmpty ifTrue: [ ^ nil ].
+
+    ^ sportsmen inject: sportsmen first into: [ :highest :each |
+        each earnings > highest earnings
+            ifTrue: [ each ]
+            ifFalse: [ highest ]
+    ]! !
+
+!SportsClub methodsFor: 'as yet unclassified' stamp: 'YarynaHrynko 11/18/2026 03:12'!
+top100TennisPlayers
+    ^ sportsmen select: [ :each |
+        (each isKindOf: TennisPlayer)
+            and: [
+                each worldRanking notNil
+                    and: [
+                        each worldRanking between: 1 and: 100
+                    ]
+            ]
+    ]! !
+
+!SportsClub methodsFor: 'as yet unclassified' stamp: 'YarynaHrynko 11/18/2026 03:09'!
+topScorers
+    | footballers maxGoals |
+
+    footballers := sportsmen select: [ :each |
+        each isKindOf: FootballPlayer
+    ].
+
+    footballers isEmpty ifTrue: [ ^ #() ].
+
+    maxGoals := (footballers collect: [ :each |
+        each goals
+    ]) max.
+
+    ^ footballers select: [ :each |
+        each goals = maxGoals
+    ]! !
+
+!SportsClub methodsFor: 'as yet unclassified' stamp: 'YarynaHrynko 11/18/2026 03:13'!
+footballContracts
+    | footballers |
+
+    footballers := sportsmen select: [ :each |
+        each isKindOf: FootballPlayer
+    ].
+
+    ^ footballers asSortedCollection: [ :a :b |
+        a annualContract >= b annualContract
+    ]! !
+
+!SportsClub methodsFor: 'as yet unclassified' stamp: 'YarynaHrynko 11/18/2026 03:11'!
+top10TennisPlayers
+    ^ sportsmen select: [ :each |
+        (each isKindOf: TennisPlayer)
+            and: [
+                each worldRanking notNil
+                    and: [
+                        each worldRanking between: 1 and: 10
+                    ]
+            ]
+    ]! !

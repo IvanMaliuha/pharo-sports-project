@@ -1,28 +1,9 @@
-'From Pharo11.0.0 of 10 March 2025'!
 SpPresenter subclass: #SportspersonDialog
-    instanceVariableNames: 'typeDropList surnameInput ageInput citizenshipInput footballFields tennisFields clubInput contractInput goalsInput rankingInput prizesInput result'
-    classVariableNames: ''
-    package: 'SportsProject'!
+	instanceVariableNames: 'typeDropList surnameInput ageInput citizenshipInput footballFields tennisFields clubInput contractInput goalsInput rankingInput prizesInput result'
+	classVariableNames: ''
+	package: 'SportsProject'!
 
-
-!SportspersonDialog methodsFor: 'initialization'!
-initializePresenters
-    super initializePresenters.
-    typeDropList := self newDropList.
-    typeDropList items: #('Football player' 'Tennis player').
-    typeDropList selectIndex: 1.
-    typeDropList whenSelectedItemChangedDo: [ :item | self updateTypeFields ].
-    surnameInput := self newTextInput.
-    ageInput := self newTextInput.
-    citizenshipInput := self newTextInput.
-    clubInput := self newTextInput.
-    contractInput := self newTextInput.
-    goalsInput := self newTextInput.
-    rankingInput := self newTextInput.
-    prizesInput := self newTextInput.
-    result := nil.! !
-
-!SportspersonDialog methodsFor: 'initialization'!
+!SportspersonDialog methodsFor: 'initialization' stamp: 'YarynaHrynko 11/18/2026 01:17'!
 initializeLayout
     | commonLayout footballLayout tennisLayout buttons |
     commonLayout := SpBoxLayout newVertical
@@ -45,7 +26,7 @@ initializeLayout
     tennisFields layout: tennisLayout.
     buttons := SpBoxLayout newHorizontal
         add: (self newButton label: 'Create'; action: [ self createSportsperson ]; yourself);
-        add: (self newButton label: 'Cancel'; action: [ self close ]; yourself);
+        add: (self newButton label: 'Cancel'; action: [ self window close ]; yourself);
         yourself.
     self layout: (SpBoxLayout newVertical
         add: (self newLabel label: 'Sportsperson type');
@@ -56,22 +37,52 @@ initializeLayout
         add: buttons;
         yourself).! !
 
-!SportspersonDialog methodsFor: 'initialization'!
+!SportspersonDialog methodsFor: 'initialization' stamp: 'YarynaHrynko 11/18/2026 00:49'!
+initializePresenters
+    super initializePresenters.
+    typeDropList := self newDropList.
+    typeDropList items: #('Football player' 'Tennis player').
+    typeDropList selectIndex: 1.
+    typeDropList whenSelectedItemChangedDo: [ :item | self updateTypeFields ].
+    surnameInput := self newTextInput.
+    ageInput := self newTextInput.
+    citizenshipInput := self newTextInput.
+    clubInput := self newTextInput.
+    contractInput := self newTextInput.
+    goalsInput := self newTextInput.
+    rankingInput := self newTextInput.
+    prizesInput := self newTextInput.
+    result := nil.
+	 self initializeLayout! !
+
+!SportspersonDialog methodsFor: 'initialization' stamp: 'YarynaHrynko 11/18/2026 01:06'!
 initializeWindow: aWindowPresenter
-    aWindowPresenter title: 'Add a sportsperson'.! !
+    aWindowPresenter title: 'Add a sportsperson'.
+    aWindowPresenter initialExtent: 600@750! !
+
 
 !SportspersonDialog methodsFor: 'accessing'!
 createdSportsperson
     ^ result! !
 
-!SportspersonDialog methodsFor: 'private'!
+
+!SportspersonDialog methodsFor: 'private' stamp: 'YarynaHrynko 11/18/2026 00:56'!
 updateTypeFields
     | isFootball |
-    isFootball := typeDropList selectedItem = 'Football player'.
-    footballFields ifNotNil: [ footballFields visible: isFootball ].
-    tennisFields ifNotNil: [ tennisFields visible: isFootball not ].! !
 
-!SportspersonDialog methodsFor: 'private'!
+    isFootball := typeDropList selectedItem = 'Football player'.
+
+    isFootball
+        ifTrue: [
+            footballFields show.
+            tennisFields hide
+        ]
+        ifFalse: [
+            footballFields hide.
+            tennisFields show
+        ].! !
+
+!SportspersonDialog methodsFor: 'private' stamp: 'YarynaHrynko 11/18/2026 01:12'!
 createSportsperson
     | data type prizes |
     [
@@ -91,5 +102,5 @@ createSportsperson
                 data at: #lastTournamentPrizes put: prizes.
                 type := #tennis ].
         result := SportspersonFactory createType: type from: data.
-        self close.
+        self window close.
     ] on: Error do: [ :error | UIManager default inform: error messageText ].! !
